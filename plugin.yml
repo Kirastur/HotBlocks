@@ -1,0 +1,19 @@
+name: HotBlocks
+version: 1.0.0
+description: Modify or remove blocks after player has stepped on
+authors: [Kirastur]
+
+api-version: 1.16
+load: POSTWORLD
+main: de.polarwolf.hotblocks.main.Main
+
+commands:
+    hotblocks:
+        description: Admin-Commands for HotBlocks Plugin
+        permission: hotblocks.admin
+        usage: "Query a list of valid subcommands by using: /hotblocks help"
+
+permissions:
+    hotblocks.admn:
+        description: Can use the HotBlocks Admin-Command
+        default: op

@@ -1,0 +1,28 @@
+#
+# Welcome to the HotBlocks configuration settings
+#
+# - The configuration is not simple, so please read the documentation first
+# -
+# - Please see our Github Wiki for Documentation
+# -      https://github.com/Kirastur/HotBlocks/wiki
+# -
+# - For support you can contact us at discord.
+# -      A link to discord can be found on the Githum Wiki
+# -
+# - For a quick test do the following (assuming your world is called "world"):
+# -   1.  enter "/hotblock enable world" on the server console
+# -   2.  Place a blue concrete block on the ground
+# -   3. Jump onto this block
+# - As a result the block changes its color to red imediatly and vanishs 2 seconds later
+
+rules:
+    ConcreteBlue:
+        fromMaterial: BLUE_CONCRETE
+        toMaterial: RED_CONCRETE
+        Lifetime: 1
+        continueModify: true
+       
+    ConcreteRed:
+        fromMaterial: RED_CONCRETE
+        Lifetime: 40
+        Sound: BLOCK_STONE_BREAK
