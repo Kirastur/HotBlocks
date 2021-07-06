@@ -146,19 +146,19 @@ public class HotBlocksCommand implements CommandExecutor{
 			return true;
 		}
 		
-		if (subCommand.isHasWorld() && (args.length < 2)) {
+		if (subCommand.isParseWorld() && (args.length < 2)) {
 			sender.sendMessage(Message.MISSING_WORLDNAME.toString());
 			return true;
 		}
 		
-		if (((subCommand.isHasWorld())  && (args.length > 2)) ||
-		    ((!subCommand.isHasWorld()) && (args.length > 1))) {
+		if (((subCommand.isParseWorld())  && (args.length > 2)) ||
+		    ((!subCommand.isParseWorld()) && (args.length > 1))) {
 			sender.sendMessage(Message.TOO_MANY_PARAMETERS.toString());
 			return true;
 		}
 						
 		World world = null;
-		if (subCommand.isHasWorld()) {
+		if (subCommand.isParseWorld()) {
 			String worldName = args[1];
 			world = findWorld (worldName);
 			if (world == null) {
@@ -173,5 +173,3 @@ public class HotBlocksCommand implements CommandExecutor{
 	}
 
 }
-
-

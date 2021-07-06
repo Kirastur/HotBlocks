@@ -35,7 +35,7 @@ public class HotBlocksTabCompleter  implements TabCompleter{
 		if (args.length==2) {
 			String subCommandName = args[0];
 			SubCommand subCommand = hotBlocksCommand.findSubCommand(subCommandName);
-			if ((subCommand != null) && (subCommand.isHasWorld())) {
+			if ((subCommand != null) && (subCommand.isParseWorld())) {
 				return hotBlocksCommand.enumWorlds();				
 			}
 		}

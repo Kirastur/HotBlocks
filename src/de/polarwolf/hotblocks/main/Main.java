@@ -20,7 +20,16 @@ public class Main extends JavaPlugin {
 	
 	public static final String RULE_SECTION = "rules";
 	public static final String COMMAND_NAME = "hotblocks";
+	
+	protected ConfigManager configManager = null;
+	protected WorldManager worldManager = null;
+	protected ModificationManager modificationManager = null;
+	protected ListenManager listenManager = null;
+	protected HotBlocksAPI hotBlocksAPI = null;
+	protected HotBlocksCommand hotBlocksCommand = null;
+	protected HotBlocksTabCompleter hotBlocksTabCompleter = null;
 
+	
 	@Override
 	public void onEnable() {
 		
@@ -28,25 +37,27 @@ public class Main extends JavaPlugin {
 		saveDefaultConfig();
 		
 		// Create ConfigManager
-		ConfigManager configManager = new ConfigManager(this, RULE_SECTION);
+		configManager = new ConfigManager(this, RULE_SECTION);
 		
 		// Create WorldManager
-		WorldManager worldManager = new WorldManager();
+		worldManager = new WorldManager();
 
 		// Create ModificationManager (the list of active blocks to be destroyed)
-		ModificationManager modificationManager = new ModificationManager(this, configManager);
+		modificationManager = new ModificationManager(this, configManager);
 		
 		// Register EventHandler (Listener)
-		ListenManager.registerEvents(this, worldManager, modificationManager);
+		listenManager = new ListenManager(this, worldManager, modificationManager);
+		listenManager.registerListener();
 	    
 	    // Initialize the API
-	    HotBlocksAPI hotBlocksAPI = new HotBlocksAPI(configManager, worldManager, modificationManager);
+	    hotBlocksAPI = new HotBlocksAPI(configManager, worldManager, modificationManager);
 		HotBlocksProvider.setAPI(hotBlocksAPI);
 		
 		// Register Command and TabCompleter
-		HotBlocksCommand hotBlocksCommand = new HotBlocksCommand(this, hotBlocksAPI);
+		hotBlocksCommand = new HotBlocksCommand(this, hotBlocksAPI);
 		getCommand(COMMAND_NAME).setExecutor(hotBlocksCommand);
-		getCommand(COMMAND_NAME).setTabCompleter(new HotBlocksTabCompleter(hotBlocksCommand));
+		hotBlocksTabCompleter = new HotBlocksTabCompleter(hotBlocksCommand);
+		getCommand(COMMAND_NAME).setTabCompleter(hotBlocksTabCompleter);
 		
 		// Enable bStats Metrics
 		// Please download the bstats-code direct form their homepage
@@ -64,4 +75,16 @@ public class Main extends JavaPlugin {
 		}
 	}
 	
+
+	@Override
+	public void onDisable() {
+		if (listenManager != null) {
+			listenManager.unregisterListener();
+		}
+
+		if (modificationManager != null) {
+			modificationManager.prepareDisable();
+		}
+	}
+
 }

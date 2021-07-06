@@ -16,7 +16,7 @@ import de.polarwolf.hotblocks.config.ConfigManager;
 
 public class ModificationManager {
 	
-	public static final double SCAN_DEEP  = 0.01; 
+	public static final double SCAN_DEEP  = 0.05; 
 	
 	protected final Plugin plugin;
 	protected final ConfigManager configManager;
@@ -283,6 +283,11 @@ public class ModificationManager {
 			scheduler.cancel();
 			scheduler = null;
 		}
+	}
+	
+	// Stop the Scheduler if the plugin gets disabled
+	public void prepareDisable() {
+		stopScheduler();
 	}
 
 }

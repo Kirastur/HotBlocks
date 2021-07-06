@@ -12,12 +12,12 @@ public enum SubCommand {
 	
 	
 	private final String command;
-	private final boolean hasWorld; 
+	private final boolean parseWorld; 
 	
 
-	private SubCommand(String command, boolean hasWorld) {
+	private SubCommand(String command, boolean parseWorld) {
 		this.command = command;
-		this.hasWorld = hasWorld;
+		this.parseWorld = parseWorld;
 	}
 
 
@@ -26,8 +26,8 @@ public enum SubCommand {
 	}
 
 
-	public boolean isHasWorld() {
-		return hasWorld;
+	public boolean isParseWorld() {
+		return parseWorld;
 	}
 
 }
