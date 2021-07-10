@@ -1,7 +1,7 @@
 # HotBlocks
 Modify or remove blocks after player has stepped on (minecraft plugin)
 
-T# Documentation
+# Documentation
 Please see the Github Wiki
 
 # Support
