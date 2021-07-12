@@ -38,33 +38,60 @@ public class ListenManager implements Listener {
 	public void unregisterListener() {
 		HandlerList.unregisterAll(this);
 	}
-		
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerMoveEvent(PlayerMoveEvent event) {
+	
+	
+	protected void handlePlayerMoveEvent(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
 		Location toLocation = event.getTo();
 		if (worldManager.isActiveWorld(toLocation.getWorld())) {
 			modificationManager.checkPlayer(player, toLocation);
+		}
+	}
+		
+
+	protected void handlePlayerTeleportEvent(PlayerTeleportEvent event) {
+		Player player = event.getPlayer();
+		Location toLocation = event.getTo();
+		if (worldManager.isActiveWorld(toLocation.getWorld())) {
+			modificationManager.checkPlayer(player, toLocation);
+		}
+	}
+
+
+	protected void handleWorldUnloadEvent(WorldUnloadEvent event) {
+		World world = event.getWorld();
+		worldManager.removeWorld(world);
+		modificationManager.cancelWorld(world);
+	}
+
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerMoveEvent(PlayerMoveEvent event) {
+		try {
+			handlePlayerMoveEvent(event);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerTeleportEvent(PlayerTeleportEvent event) {
-		Player player = event.getPlayer();
-		Location toLocation = event.getTo();
-		if (worldManager.isActiveWorld(toLocation.getWorld())) {
-			modificationManager.checkPlayer(player, toLocation);
+		try {
+			handlePlayerTeleportEvent(event);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-
 	
+
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onWorldUnloadEvent(WorldUnloadEvent event) {
-		World world = event.getWorld();
-		worldManager.removeWorld(world);
-		modificationManager.cancelWorld(world);
+		try {
+			handleWorldUnloadEvent(event);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

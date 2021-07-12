@@ -26,8 +26,7 @@ public class HotBlocksTabCompleter  implements TabCompleter{
 		
 		
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+	protected List<String> handleTabComplete(String[] args) {
 		if (args.length==1) {
 			return listCommands();
 		}
@@ -40,6 +39,18 @@ public class HotBlocksTabCompleter  implements TabCompleter{
 			}
 		}
 
+		return new ArrayList<>();
+	}
+
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		try {
+			return handleTabComplete(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+			sender.sendMessage(Message.JAVA_EXCEPTOPN.toString());
+		}
 		return new ArrayList<>();
 	}
 

@@ -133,8 +133,7 @@ public class HotBlocksCommand implements CommandExecutor{
 	}
 
 	
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	protected boolean handleCommand(CommandSender sender, String[] args) {
 		if (args.length==0) {
 			return false;
 		}
@@ -172,4 +171,16 @@ public class HotBlocksCommand implements CommandExecutor{
 		return true; 
 	}
 
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		try {
+			return handleCommand(sender, args);
+		} catch (Exception e) {
+			e.printStackTrace();
+			sender.sendMessage(Message.JAVA_EXCEPTOPN.toString());
+		}
+		return true;
+	}
+	
 }

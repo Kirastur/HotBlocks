@@ -23,7 +23,12 @@ public class Scheduler extends BukkitRunnable {
 
 	@Override
     public void run() {
-    	handleTick();
-    }
+		try {
+		   	handleTick();
+		} catch (Exception e) {
+			e.printStackTrace();
+			cancel();
+		}
+	}
 
 }

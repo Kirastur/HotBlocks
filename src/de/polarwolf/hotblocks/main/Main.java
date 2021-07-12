@@ -78,6 +78,8 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		HotBlocksProvider.setAPI(null);
+		
 		if (listenManager != null) {
 			listenManager.unregisterListener();
 		}

@@ -4,6 +4,7 @@ public enum Message {
 
 	OK ("OK"),
 	ERROR ("ERROR"),
+	JAVA_EXCEPTOPN ("Java Exception Error"),
 	HELP ("Valid commands are: "),
 	ACTIVE_WORLD_LIST ("Active worlds are: "),
 	NO_ACTIVE_WORLDS ("There are no active worlds"),
