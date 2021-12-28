@@ -15,14 +15,32 @@
 # -   3. Jump onto this block
 # - As a result the block changes its color to red imediatly and vanishs 2 seconds later
 
+startup:
+
+   # Use Passive mode
+   #
+   # - In passive mode the plugin engine is not initialized,
+   # - only the Java objects are avail.
+   # - You had to instanciate your own orchestratator
+   # - and regsiter it as API.
+   # - Use this option only if you customize the Java objects itself 
+   passiveMode: false
+   
+   # Debug
+   #
+   # - Enable Debug Messages to server console
+   debug: false
+   
+   
 rules:
     ConcreteBlue:
         fromMaterial: BLUE_CONCRETE
         toMaterial: RED_CONCRETE
-        Lifetime: 1
+        lifetime: 1
+        points: 1
         continueModify: true
        
     ConcreteRed:
         fromMaterial: RED_CONCRETE
-        Lifetime: 40
-        Sound: BLOCK_STONE_BREAK
+        lifetime: 40
+        sound: BLOCK_STONE_BREAK

@@ -1,34 +1,32 @@
 package de.polarwolf.hotblocks.config;
 
 public enum ConfigParam {
-	
-	WORLDS ("worlds", ""),
-	CORNER1 ("Corner1", ""),
-	CORNER2 ("Corner2", ""),
-	PERMISSION ("Permission", ""),
-	FROM_MATERIAL ("fromMaterial", ""),
-	TO_MATERIAL ("toMaterial", "AIR"),
-	LIFETIME ("Lifetime", "20"),
-	SOUND ("Sound", ""),
-	VOLUME ("Volume", "1"),
-	PITCH ("Pitch", "0"),
-	CONTINUE_MODIFY ("continueModify", "FALSE");
-	
-	
+
+	WORLDS("worlds", ""),
+	CORNER1("corner1", ""),
+	CORNER2("corner2", ""),
+	PERMISSION("permission", ""),
+	FROM_MATERIAL("fromMaterial", ""),
+	TO_MATERIAL("toMaterial", "AIR"),
+	LIFETIME("lifetime", "20"),
+	SOUND("sound", ""),
+	VOLUME("volume", "1"),
+	PITCH("Pitch", "0"),
+	CONTINUE_MODIFY("continueModify", "FALSE"),
+	POINTS("points", "0"),
+	CUSTOM("Custom", "");
+
 	private final String attributeName;
-	private final String defaultValue; 
-	
+	private final String defaultValue;
 
 	private ConfigParam(String attributeName, String defaultValue) {
 		this.attributeName = attributeName;
 		this.defaultValue = defaultValue;
 	}
 
-
 	public String getAttributeName() {
 		return attributeName;
 	}
-
 
 	public String getDefaultValue() {
 		return defaultValue;

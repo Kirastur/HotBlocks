@@ -7,41 +7,64 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
-public class HotBlocksTabCompleter  implements TabCompleter{
-	
+import de.polarwolf.hotblocks.main.Main;
+import static de.polarwolf.hotblocks.commands.ParamType.*;
+
+public class HotBlocksTabCompleter implements TabCompleter {
+
 	protected final HotBlocksCommand hotBlocksCommand;
-	
-	public HotBlocksTabCompleter(HotBlocksCommand hotBlocksCommand) {
+
+	public HotBlocksTabCompleter(Main main, HotBlocksCommand hotBlocksCommand) {
 		this.hotBlocksCommand = hotBlocksCommand;
+		main.getCommand(hotBlocksCommand.getCommandName()).setTabCompleter(this);
 	}
 
-
-	protected List<String> listCommands() {
-		List<String> cmds = new ArrayList<>();
-		for (SubCommand subCommand : SubCommand.values()) {
-			cmds.add(subCommand.getCommand());
-		}
-		return cmds;
+	protected List<String> listActions() {
+		return hotBlocksCommand.enumActions();
 	}
-		
-		
+
+	protected List<String> listWorlds() {
+		return hotBlocksCommand.enumWorlds();
+	}
+
+	protected List<String> listHotWorlds() {
+		return hotBlocksCommand.enumHotWorlds();
+	}
+
+	protected List<String> listObjectives() {
+		return hotBlocksCommand.enumObjectives();
+	}
 
 	protected List<String> handleTabComplete(String[] args) {
-		if (args.length==1) {
-			return listCommands();
+		if (args.length < 1) {
+			return new ArrayList<>();
 		}
-		
-		if (args.length==2) {
-			String subCommandName = args[0];
-			SubCommand subCommand = hotBlocksCommand.findSubCommand(subCommandName);
-			if ((subCommand != null) && (subCommand.isParseWorld())) {
-				return hotBlocksCommand.enumWorlds();				
-			}
+		if (args.length == 1) {
+			return listActions();
 		}
 
+		String actionName = args[0];
+		Action action = hotBlocksCommand.findAction(actionName);
+		if (action == null) {
+			return new ArrayList<>();
+		}
+
+		if (args.length-1 > action.getParamCount()) {
+			return new ArrayList<>();
+		}
+
+		ParamType paramType = action.getParam(args.length-1);
+		if (paramType == WORLD) {
+			return listWorlds();
+		}
+		if (paramType == HOTWORLD) {
+			return listHotWorlds();
+		}
+		if (paramType == OBJECTIVE) {
+			return listObjectives();
+		}
 		return new ArrayList<>();
 	}
-
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {

@@ -1,106 +1,124 @@
 package de.polarwolf.hotblocks.api;
 
-import java.util.Set;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import de.polarwolf.hotblocks.config.ConfigRule;
 import de.polarwolf.hotblocks.config.ConfigManager;
+import de.polarwolf.hotblocks.config.ConfigRule;
+import de.polarwolf.hotblocks.config.ConfigSection;
+import de.polarwolf.hotblocks.config.Coordinate;
 import de.polarwolf.hotblocks.exception.HotBlocksException;
-import de.polarwolf.hotblocks.modifications.ModificationManager;
 import de.polarwolf.hotblocks.modifications.Modification;
+import de.polarwolf.hotblocks.modifications.ModificationManager;
+import de.polarwolf.hotblocks.worlds.HotWorld;
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
 public class HotBlocksAPI {
-	
-	protected ConfigManager configManager;
-	protected WorldManager worldManager;
-	protected ModificationManager modificationManager;
-	
-	
-	public HotBlocksAPI(ConfigManager configManager, WorldManager worldManager, ModificationManager modificationManager) {
-		this.configManager = configManager;
-		this.worldManager = worldManager;
-		this.modificationManager = modificationManager;
+
+	private final ConfigManager configManager;
+	private final ModificationManager modificationManager;
+	private final WorldManager worldManager;
+	private final HotBlocksOrchestrator orchestrator;
+
+	public HotBlocksAPI(HotBlocksOrchestrator orchestrator) {
+		this.configManager = orchestrator.getConfigManager();
+		this.modificationManager = orchestrator.getMofificationManager();
+		this.worldManager = orchestrator.getWorldManager();
+		this.orchestrator = orchestrator;
 	}
-	
-	
+
 	// ConfigManager
-	public Set<ConfigRule> getRules() {
+	public List<ConfigRule> getRules() {
 		return configManager.getRules();
 	}
-	
-	public void setConfig (Plugin newPlugin, String newConfigPath) {
-		configManager.setConfig(newPlugin, newConfigPath);
+
+	public ConfigSection buildConfigSectionFromLocalConfigFile(Plugin plugin, String configPath)
+			throws HotBlocksException {
+		return configManager.buildConfigSectionFromLocalConfigFile(plugin, configPath);
 	}
 
-	public void reload() throws HotBlocksException {
-		configManager.reload();
-	}	
-	
-	
-	// WorldManager
-	public Set<World> getActiveWorlds() {
-		return worldManager.getActiveWorlds();
+	public void replaceConfig(ConfigSection newConfigSection, CommandSender initiator) {
+		configManager.replaceConfig(newConfigSection, initiator);
 	}
 
-	public boolean isActiveWorld(World world) {
-		return worldManager.isActiveWorld(world);
-	}
-			
-	public void addWorld(World world) {
-		worldManager.addWorld(world);
+	public void reload(CommandSender initiator) {
+		configManager.reload(initiator);
 	}
 
-	public void removeWorld(World world) {
-		worldManager.removeWorld(world);
+	public void scheduleRedloadFoNextTick() {
+		configManager.scheduleRedloadFoNextTick();
 	}
 
-		
-	// ModificationManager Set-Management
-	public Modification findModification(Location location) {
-		return modificationManager.findModification(location);
-	}
-		
-	public boolean isLocationModifying(Location location) {
-		return modificationManager.isLocationModifying(location);
-	}
-		
-	public Set<Modification> getModifications() {
+	// ModificationManager
+	public List<Modification> getModifications() {
 		return modificationManager.getModifications();
 	}
-	
-	public int getModificationCount() {
-		return modificationManager.getModificationCount();
+
+	public Modification findModification(World world, Coordinate blockCoordinate) {
+		return modificationManager.findModification(world, blockCoordinate);
 	}
 
-	
-	// ModificationManager Business-Logic
-	public boolean addModification(Player player, Location location, ConfigRule rule) {
-		return modificationManager.addModification(player, location, rule);
+	public boolean isModifying(World world, Coordinate blockCoordinate) {
+		return modificationManager.isModifying(world, blockCoordinate);
 	}
-				
-	public boolean removeModification(Location location) {
-		return modificationManager.removeModification(location);
+
+	public void addModification(Modification newModification) {
+		modificationManager.addModification(newModification);
 	}
-					
-	public boolean checkLocation(Location location) {
-		return modificationManager.checkLocation(null, location);
+
+	public boolean removeModification(Modification oldModification) {
+		return modificationManager.removeModification(oldModification);
 	}
-						
-	public int checkPlayer(Player player, Location targetLocation) {
-		return modificationManager.checkPlayer(player, targetLocation);
-	}
-							
-	public int checkWorld(World world) {
-		return modificationManager.checkWorld(world);
-	}
-								
-	public int cancelWorld(World world) {
+
+	public int cancelModifications(World world) {
 		return modificationManager.cancelWorld(world);
+	}
+
+	// WorldManager
+	public List<HotWorld> getHotWorlds() {
+		return worldManager.getHotWorlds();
+	}
+
+	public HotWorld findHotWorld(World world) {
+		return worldManager.findHotWorld(world);
+	}
+
+	public boolean hasHotWorld(World world) {
+		return worldManager.hasHotWorld(world);
+	}
+
+	public HotWorld addHotWorld(World world, boolean startInPauseMode) throws HotBlocksException {
+		return worldManager.addHotWorld(world, startInPauseMode);
+	}
+
+	public void removeHotWorld(HotWorld hotWorld) {
+		worldManager.removeHotWorld(hotWorld);
+	}
+
+	public boolean removeHotWorld(World world) {
+		return worldManager.removeHotWorld(world);
+	}
+
+	public boolean checkBlock(Player player, World world, Coordinate blockCoordinate) {
+		return worldManager.checkBlock(player, world, blockCoordinate);
+	}
+
+	public int checkPlayer(Player player, Location location) {
+		return worldManager.checkPlayer(player, location);
+	}
+
+	public int checkWorld(World world) {
+		return worldManager.checkWorld(world);
+	}
+
+	// Disable
+	public boolean isDisabled() {
+		return orchestrator.isDisabled();
 	}
 
 }
