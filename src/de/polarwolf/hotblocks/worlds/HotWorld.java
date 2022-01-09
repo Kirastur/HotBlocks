@@ -16,18 +16,16 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.BoundingBox;
 
-import de.polarwolf.hotblocks.api.HotBlocksAPI;
 import de.polarwolf.hotblocks.config.ConfigRule;
 import de.polarwolf.hotblocks.config.Coordinate;
-import de.polarwolf.hotblocks.events.EventHelper;
+import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.modifications.Modification;
 
 public class HotWorld {
 
 	public static final double SCAN_DEEP = 0.05;
 
-	private EventHelper eventHelper;
-	private HotBlocksAPI api;
+	private WorldHelper worldHelper;
 
 	protected final World world;
 	protected boolean pause;
@@ -59,26 +57,18 @@ public class HotWorld {
 		return world;
 	}
 
-	public EventHelper getEventHelper() {
-		return eventHelper;
+	protected WorldHelper getWorldHelper() {
+		return worldHelper;
 	}
 
-	final void setEventHelper(EventHelper eventHelper) {
-		this.eventHelper = eventHelper;
-	}
-
-	protected HotBlocksAPI getAPI() {
-		return api;
-	}
-
-	final void setApi(HotBlocksAPI api) {
-		this.api = api;
+	final void setWorldHelper(WorldHelper worldHelper) {
+		this.worldHelper = worldHelper;
 	}
 
 	// Send Warn-Message to console that two rules try to modify the same location.
 	protected void warnForOverlappingRules(String ruleName1, String ruleName2) {
 		String s = String.format("Overlapping rules found: %s  and  %s", ruleName1, ruleName2);
-		eventHelper.getHotLogger().printWarning(s);
+		worldHelper.getHotLogger().printWarning(s);
 	}
 
 	// Test if a given location fulfills the rule to get modified.
@@ -87,7 +77,7 @@ public class HotWorld {
 	protected boolean testRuleForBlock(ConfigRule rule, Coordinate blockCoordinate) {
 		Location location = blockCoordinate.toLocation(world);
 		Block block = location.getBlock();
-		return (rule.getFromMaterial().equals(block.getType()) && rule.isInWorld(world.getName())
+		return (rule.hasFromMaterial(block.getType()) && rule.isInWorld(world.getName())
 				&& rule.isInRegion(blockCoordinate));
 	}
 
@@ -101,12 +91,23 @@ public class HotWorld {
 		}
 	}
 
+	// Test if the given TriggerEvent fulfills the rule.
+	// Note: If triggerEvent is NULL this always matches.
+	protected boolean testRuleForTriggerEvent(ConfigRule rule, TriggerEvent triggerEvent) {
+		if (triggerEvent == null) {
+			return true;
+		} else {
+			return rule.hasListener(triggerEvent);
+		}
+	}
+
 	// Find a default rule.
 	// This rule is used if the CheckBlockEvent does not deliver a custom one.
-	public ConfigRule findDefaultRule(Player player, Coordinate blockCoordinate) {
+	public ConfigRule findDefaultRule(Player player, Coordinate blockCoordinate, TriggerEvent triggerEvent) {
 		ConfigRule lastRule = null;
-		for (ConfigRule myRule : getAPI().getRules()) {
-			if (testRuleForBlock(myRule, blockCoordinate) && testRuleForPlayer(myRule, player)) {
+		for (ConfigRule myRule : worldHelper.getRules()) {
+			if (testRuleForBlock(myRule, blockCoordinate) && testRuleForPlayer(myRule, player)
+					&& testRuleForTriggerEvent(myRule, triggerEvent)) {
 				if (lastRule != null) {
 					warnForOverlappingRules(lastRule.getName(), myRule.getName());
 				}
@@ -117,8 +118,8 @@ public class HotWorld {
 	}
 
 	// Finds the rule used to modify a block by sending a CheckBlock-Event.
-	public ConfigRule findRule(Player player, Coordinate blockCoordinate) {
-		return eventHelper.sendCheckBlockEvent(player, blockCoordinate);
+	public ConfigRule findRule(Player player, Coordinate blockCoordinate, TriggerEvent triggerEvent) {
+		return worldHelper.sendCheckBlockEvent(player, blockCoordinate, triggerEvent);
 	}
 
 	// Generates a default Modification.
@@ -129,7 +130,7 @@ public class HotWorld {
 
 	// Create a Modification by sending a TriggerBlock-Event.
 	public Modification generateModification(Player player, Coordinate blockCoordinate, ConfigRule rule) {
-		return eventHelper.sendTriggerBlockEvent(player, blockCoordinate, rule);
+		return worldHelper.sendTriggerBlockEvent(player, blockCoordinate, rule);
 	}
 
 	// Add a new modification for the given Location with the attached rule.
@@ -137,14 +138,14 @@ public class HotWorld {
 	// False: There is already a modification for this location. It will not be
 	// overwritten. Or the Event was cancelled.
 	public boolean triggerBlock(Player player, Coordinate blockCoordinate, ConfigRule rule) {
-		if (getAPI().isDisabled() || getAPI().isModifying(world, blockCoordinate)) {
+		if (worldHelper.isDisabled() || worldHelper.isModifying(blockCoordinate)) {
 			return false;
 		}
 		Modification newModification = generateModification(player, blockCoordinate, rule);
 		if (newModification == null) {
 			return false;
 		}
-		getAPI().addModification(newModification);
+		worldHelper.addModification(newModification);
 		if (player != null) {
 			scorePlayer(player, rule);
 			updateScoreboard(player, rule);
@@ -158,8 +159,8 @@ public class HotWorld {
 	// The player is only used to check for his permission.
 	// Returns true if a modification for this location was added.
 	// False means no rules apply or a modification is already active.
-	public boolean checkBlock(Player player, Coordinate blockCoordinate) {
-		ConfigRule rule = findRule(player, blockCoordinate);
+	public boolean checkBlock(Player player, Coordinate blockCoordinate, TriggerEvent triggerEvent) {
+		ConfigRule rule = findRule(player, blockCoordinate, triggerEvent);
 		if (rule == null) {
 			return false;
 		}
@@ -203,11 +204,11 @@ public class HotWorld {
 	// targetLocation is the center of the player's baseplate, the player is then
 	// only used for permission check
 	// Returns the number of modifications added.
-	public int checkPlayer(Player player, Location targetLocation) {
+	public int checkPlayer(Player player, Location targetLocation, TriggerEvent triggerEvent) {
 		int count = 0;
 		Set<Coordinate> checkCoordinates = calcCoordinatesToCheck(player.getBoundingBox(), targetLocation);
 		for (Coordinate myCoordinate : checkCoordinates) {
-			if (checkBlock(player, myCoordinate)) {
+			if (checkBlock(player, myCoordinate, triggerEvent)) {
 				count = count + 1;
 			}
 		}
@@ -221,14 +222,13 @@ public class HotWorld {
 	public int checkWorld() {
 		int count = 0;
 		for (Player player : getWorld().getPlayers()) {
-			count = count + checkPlayer(player, player.getLocation());
+			count = count + checkPlayer(player, player.getLocation(), TriggerEvent.WORLDCHECK);
 		}
 		return count;
 	}
 
-	protected void cancel() {
-		// Nothing to do
-		// Modifications are cleaned up by the WorldManagert
+	protected int cancel() {
+		return worldHelper.cancelModifications();
 	}
 
 	protected void scorePlayer(Player player, ConfigRule rule) {

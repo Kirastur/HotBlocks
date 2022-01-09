@@ -9,6 +9,7 @@ import org.bukkit.event.HandlerList;
 
 import de.polarwolf.hotblocks.config.ConfigRule;
 import de.polarwolf.hotblocks.config.Coordinate;
+import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.worlds.HotWorld;
 
 public class HotBlocksCheckBlockEvent extends Event implements Cancellable {
@@ -19,12 +20,14 @@ public class HotBlocksCheckBlockEvent extends Event implements Cancellable {
 	protected final Player player;
 	protected final HotWorld hotWorld;
 	protected final Coordinate blockCoordinate;
+	protected final TriggerEvent triggerEvent;
 	protected ConfigRule rule = null;
 
-	HotBlocksCheckBlockEvent(Player player, HotWorld hotWorld, Coordinate blockCoordinate) {
+	HotBlocksCheckBlockEvent(Player player, HotWorld hotWorld, Coordinate blockCoordinate, TriggerEvent triggerEvent) {
 		this.player = player;
 		this.hotWorld = hotWorld;
 		this.blockCoordinate = blockCoordinate;
+		this.triggerEvent = triggerEvent;
 	}
 
 	public Player getPlayer() {
@@ -45,6 +48,10 @@ public class HotBlocksCheckBlockEvent extends Event implements Cancellable {
 
 	public HotWorld getHotWorld() {
 		return hotWorld;
+	}
+
+	public TriggerEvent getTriggerEvent() {
+		return triggerEvent;
 	}
 
 	public boolean hasRule() {

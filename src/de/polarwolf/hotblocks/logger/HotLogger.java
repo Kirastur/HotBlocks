@@ -2,7 +2,6 @@ package de.polarwolf.hotblocks.logger;
 
 import org.bukkit.plugin.Plugin;
 
-import de.polarwolf.hotblocks.api.HotBlocksOrchestrator;
 import de.polarwolf.hotblocks.config.ConfigManager;
 
 public class HotLogger {
@@ -10,8 +9,8 @@ public class HotLogger {
 	private boolean debug = true;
 	protected final Plugin plugin;
 
-	public HotLogger(HotBlocksOrchestrator orchestrator) {
-		this.plugin = orchestrator.getPlugin();
+	public HotLogger(Plugin plugin) {
+		this.plugin = plugin;
 		this.debug = ConfigManager.isInitialDebug(plugin);
 	}
 

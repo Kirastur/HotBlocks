@@ -1,65 +1,76 @@
 package de.polarwolf.hotblocks.listener;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
 
 import de.polarwolf.hotblocks.api.HotBlocksOrchestrator;
+import de.polarwolf.hotblocks.config.ConfigManager;
+import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
-public class ListenManager implements Listener {
+public class ListenManager {
 
 	protected final Plugin plugin;
-	protected final WorldManager worldManager;
+	protected final ConfigManager configManager;
+
+	protected PlayerMoveListener playerMoveListener = null;
+	protected PlayerTeleportListener playerTeleportListener = null;
+	protected BlockPlaceListener blockPlaceListener = null;
+	protected WorldUnloadListener worldUnloadListener = null;
 
 	public ListenManager(HotBlocksOrchestrator orchestrator) {
 		this.plugin = orchestrator.getPlugin();
-		this.worldManager = orchestrator.getWorldManager();
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		this.configManager = orchestrator.getConfigManager();
 	}
 
-	public void unregisterListener() {
-		HandlerList.unregisterAll(this);
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerMoveEvent(PlayerMoveEvent event) {
-		try {
-			Player player = event.getPlayer();
-			Location toLocation = event.getTo();
-			worldManager.checkPlayer(player, toLocation);
-		} catch (Exception e) {
-			e.printStackTrace();
+	protected void updateWorldUnloadListener(WorldManager worldManager) {
+		if (!worldManager.getHotWorlds().isEmpty() && (worldUnloadListener == null)) {
+			worldUnloadListener = new WorldUnloadListener(plugin, worldManager);
+			worldUnloadListener.registerListener();
+		}
+		if (worldManager.getHotWorlds().isEmpty() && (worldUnloadListener != null)) {
+			worldUnloadListener.unregisterListener();
+			worldUnloadListener = null;
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerTeleportEvent(PlayerTeleportEvent event) {
-		try {
-			Player player = event.getPlayer();
-			Location toLocation = event.getTo();
-			worldManager.checkPlayer(player, toLocation);
-		} catch (Exception e) {
-			e.printStackTrace();
+	protected void updatePlayerMoveListener(WorldManager worldManager) {
+		if (configManager.hasListener(TriggerEvent.PLAYERMOVEEVENT) && (playerMoveListener == null)) {
+			playerMoveListener = new PlayerMoveListener(plugin, worldManager);
+			playerMoveListener.registerListener();
+		}
+		if (!configManager.hasListener(TriggerEvent.PLAYERMOVEEVENT) && (playerMoveListener != null)) {
+			playerMoveListener.unregisterListener();
+			playerMoveListener = null;
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onWorldUnloadEvent(WorldUnloadEvent event) {
-		try {
-			World world = event.getWorld();
-			worldManager.removeHotWorld(world);
-		} catch (Exception e) {
-			e.printStackTrace();
+	protected void updatePlayerTeleportListener(WorldManager worldManager) {
+		if (configManager.hasListener(TriggerEvent.PLAYERTELEPORTEVENT) && (playerTeleportListener == null)) {
+			playerTeleportListener = new PlayerTeleportListener(plugin, worldManager);
+			playerTeleportListener.registerListener();
 		}
+		if (!configManager.hasListener(TriggerEvent.PLAYERTELEPORTEVENT) && (playerTeleportListener != null)) {
+			playerTeleportListener.unregisterListener();
+			playerTeleportListener = null;
+		}
+	}
+
+	protected void updateBlockPlaceListener(WorldManager worldManager) {
+		if (configManager.hasListener(TriggerEvent.BLOCKPLACEEVENT) && (blockPlaceListener == null)) {
+			blockPlaceListener = new BlockPlaceListener(plugin, worldManager);
+			blockPlaceListener.registerListener();
+		}
+		if (!configManager.hasListener(TriggerEvent.BLOCKPLACEEVENT) && (blockPlaceListener != null)) {
+			blockPlaceListener.unregisterListener();
+			blockPlaceListener = null;
+		}
+	}
+
+	public void updateListener(WorldManager worldManager) {
+		updateWorldUnloadListener(worldManager);
+		updatePlayerMoveListener(worldManager);
+		updatePlayerTeleportListener(worldManager);
+		updateBlockPlaceListener(worldManager);
 	}
 
 }

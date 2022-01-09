@@ -1,6 +1,7 @@
 package de.polarwolf.hotblocks.events;
 
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -8,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import de.polarwolf.hotblocks.api.HotBlocksOrchestrator;
 import de.polarwolf.hotblocks.config.ConfigRule;
 import de.polarwolf.hotblocks.config.Coordinate;
+import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.logger.HotLogger;
 import de.polarwolf.hotblocks.modifications.Modification;
 import de.polarwolf.hotblocks.worlds.HotWorld;
@@ -20,10 +22,6 @@ public class EventManager {
 	public EventManager(HotBlocksOrchestrator orchestrator) {
 		this.plugin = orchestrator.getPlugin();
 		this.hotLogger = orchestrator.getHotLogger();
-	}
-
-	public EventHelper getEventHelper(HotWorld hotWorld) {
-		return new EventHelper(this, hotWorld, hotLogger);
 	}
 
 	protected HotWorld findDefaultHotWorld(World world, boolean startInPauseMode) {
@@ -51,8 +49,9 @@ public class EventManager {
 		return findDefaultHotWorld(world, startInPauseMode);
 	}
 
-	public ConfigRule sendCheckBlockEvent(Player player, HotWorld hotWorld, Coordinate blockCoordinate) {
-		HotBlocksCheckBlockEvent event = new HotBlocksCheckBlockEvent(player, hotWorld, blockCoordinate);
+	public ConfigRule sendCheckBlockEvent(Player player, HotWorld hotWorld, Coordinate blockCoordinate,
+			TriggerEvent triggerEvent) {
+		HotBlocksCheckBlockEvent event = new HotBlocksCheckBlockEvent(player, hotWorld, blockCoordinate, triggerEvent);
 		plugin.getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			return null;
@@ -63,7 +62,7 @@ public class EventManager {
 					rule.getName(), hotWorld.getWorld().getName()));
 			return rule;
 		}
-		ConfigRule rule = hotWorld.findDefaultRule(player, blockCoordinate);
+		ConfigRule rule = hotWorld.findDefaultRule(player, blockCoordinate, triggerEvent);
 		if (rule != null) {
 			hotLogger.printDebug(String.format("Default Rule \"%s\" found for blockcheck in world \"%s\"",
 					rule.getName(), hotWorld.getWorld().getName()));
@@ -97,8 +96,8 @@ public class EventManager {
 		return modification;
 	}
 
-	public boolean sendModifyBlockEvent(Modification modification) {
-		HotBlocksModifyBlockEvent event = new HotBlocksModifyBlockEvent(modification);
+	public boolean sendModifyBlockEvent(Modification modification, BlockData blockData) {
+		HotBlocksModifyBlockEvent event = new HotBlocksModifyBlockEvent(modification, blockData);
 		plugin.getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			hotLogger.printDebug(String.format("Modification with Rule \"%s\" in world \"%s\" was cancelled",

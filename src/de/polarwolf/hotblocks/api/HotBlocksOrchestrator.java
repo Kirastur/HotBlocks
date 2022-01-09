@@ -19,9 +19,9 @@ public class HotBlocksOrchestrator {
 	private final HotLogger hotLogger;
 	private final EventManager eventManager;
 	private final ConfigManager configManager;
+	private final ListenManager listenManager;
 	private final ModificationManager modificationManager;
 	private final WorldManager worldManager;
-	private final ListenManager listenManager;
 
 	public HotBlocksOrchestrator(Plugin plugin) throws HotBlocksException {
 		if (plugin != null) {
@@ -29,17 +29,15 @@ public class HotBlocksOrchestrator {
 		} else {
 			this.plugin = Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
 		}
-		if (!HotBlocksProvider.clearAPI()) {
-			throw new HotBlocksException(this.plugin.getName(),
-					"Can't start orchestrator, another instance is already running", null);
-		}
+		testAPI();
+
 		hotLogger = createHotLogger();
 		eventManager = createEventManager();
 		configManager = createConfigManager();
+		listenManager = createListenManager();
 		modificationManager = createModificationManager();
 		worldManager = createWorldManager();
-		listenManager = createListenManager();
-		HotBlocksProvider.setAPI(createAPI());
+		setAPI();
 	}
 
 	// Getter
@@ -59,7 +57,11 @@ public class HotBlocksOrchestrator {
 		return configManager;
 	}
 
-	public ModificationManager getMofificationManager() {
+	public ListenManager getListenManager() {
+		return listenManager;
+	}
+
+	public ModificationManager getModificationManager() {
 		return modificationManager;
 	}
 
@@ -67,13 +69,9 @@ public class HotBlocksOrchestrator {
 		return worldManager;
 	}
 
-	public ListenManager getListenManager() {
-		return listenManager;
-	}
-
 	// Creator
 	protected HotLogger createHotLogger() {
-		return new HotLogger(this);
+		return new HotLogger(plugin);
 	}
 
 	protected EventManager createEventManager() {
@@ -84,6 +82,10 @@ public class HotBlocksOrchestrator {
 		return new ConfigManager(this);
 	}
 
+	protected ListenManager createListenManager() {
+		return new ListenManager(this);
+	}
+
 	protected ModificationManager createModificationManager() {
 		return new ModificationManager(this);
 	}
@@ -92,24 +94,32 @@ public class HotBlocksOrchestrator {
 		return new WorldManager(this);
 	}
 
-	protected ListenManager createListenManager() {
-		return new ListenManager(this);
-	}
-
 	protected HotBlocksAPI createAPI() {
 		return new HotBlocksAPI(this);
 	}
 
-	// Deactivation
-	public void disable() {
-		listenManager.unregisterListener();
-		worldManager.disable();
-		modificationManager.disable();
-		HotBlocksProvider.clearAPI();
+	// API
+	protected void testAPI() throws HotBlocksException {
+		if (HotBlocksProvider.hasAPI()) {
+			throw new HotBlocksException(this.plugin.getName(),
+					"Can't start orchestrator, another instance is already running", null);
+		}
 	}
 
-	public boolean isDisabled() {
-		return modificationManager.isDisabled();
+	protected void setAPI() {
+		HotBlocksProvider.setAPI(createAPI());
+	}
+
+	protected void clearAPI() {
+		HotBlocksProvider.setAPI(null);
+	}
+
+	// Deactivation
+	public void disable() {
+		worldManager.disable();
+		modificationManager.disable();
+		listenManager.updateListener(worldManager);
+		clearAPI();
 	}
 
 }

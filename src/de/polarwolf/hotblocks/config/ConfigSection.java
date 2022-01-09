@@ -53,4 +53,13 @@ public class ConfigSection {
 		}
 	}
 
+	public boolean hasListener(TriggerEvent triggerEvent) {
+		for (ConfigRule myRule : rules) {
+			if (myRule.hasListener(triggerEvent)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

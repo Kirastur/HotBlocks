@@ -1,6 +1,9 @@
 package de.polarwolf.hotblocks.commands;
 
-import static de.polarwolf.hotblocks.commands.ParamType.*;
+import static de.polarwolf.hotblocks.commands.ParamType.HOTWORLD;
+import static de.polarwolf.hotblocks.commands.ParamType.NONE;
+import static de.polarwolf.hotblocks.commands.ParamType.OBJECTIVE;
+import static de.polarwolf.hotblocks.commands.ParamType.WORLD;
 
 public enum Action {
 
@@ -29,7 +32,7 @@ public enum Action {
 	public String getCommand() {
 		return command;
 	}
-	
+
 	public int getParamCount() {
 		if (param2 != NONE) {
 			return 2;
@@ -39,7 +42,7 @@ public enum Action {
 		}
 		return 0;
 	}
-	
+
 	public ParamType getParam(int position) {
 		if (position == 1) {
 			return param1;
@@ -49,7 +52,7 @@ public enum Action {
 		}
 		return NONE;
 	}
-	
+
 	public int findPosition(ParamType param) {
 		if (param == param1) {
 			return 1;

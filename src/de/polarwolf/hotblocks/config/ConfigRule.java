@@ -2,8 +2,11 @@ package de.polarwolf.hotblocks.config;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +23,7 @@ public class ConfigRule {
 	protected Pattern worlds;
 	protected Region region;
 	protected String permission;
-	protected Material fromMaterial;
+	protected Set<Material> fromMaterials = new HashSet<>();
 	protected Material toMaterial;
 	protected int lifetime;
 	protected Sound sound;
@@ -28,6 +31,7 @@ public class ConfigRule {
 	protected float pitch;
 	protected boolean continueModify;
 	protected int points;
+	protected Set<TriggerEvent> listeners = new HashSet<>();
 	protected String custom;
 
 	protected ConfigRule(String name) {
@@ -63,8 +67,12 @@ public class ConfigRule {
 		return permission;
 	}
 
-	public Material getFromMaterial() {
-		return fromMaterial;
+	public Set<Material> getFromMaterials() {
+		return new HashSet<>(fromMaterials);
+	}
+
+	public boolean hasFromMaterial(Material testMaterial) {
+		return fromMaterials.contains(testMaterial);
 	}
 
 	public Material getToMaterial() {
@@ -93,6 +101,14 @@ public class ConfigRule {
 
 	public int getPoints() {
 		return points;
+	}
+
+	public Set<TriggerEvent> getListeners() {
+		return new HashSet<>(listeners);
+	}
+
+	public boolean hasListener(TriggerEvent testListener) {
+		return listeners.contains(testListener);
 	}
 
 	public String getCustom() {
@@ -192,6 +208,25 @@ public class ConfigRule {
 		}
 	}
 
+	protected Set<Material> loadMaterialsValue(ConfigParam attribute, Map<String, String> parameters)
+			throws HotBlocksException {
+		Set<Material> materialSet = new HashSet<>();
+		String value = loadStringValue(attribute, parameters);
+		if (value.isEmpty()) {
+			return materialSet;
+		}
+		List<String> materialNames = Arrays.asList(value.split(" "));
+		for (String myMaterial : materialNames) {
+			try {
+				materialSet.add(Material.getMaterial(myMaterial));
+			} catch (Exception e) {
+				throw new HotBlocksException(getName() + "." + attribute.getAttributeName(), "Unknown Material",
+						myMaterial);
+			}
+		}
+		return materialSet;
+	}
+
 	protected Sound loadSoundValue(ConfigParam attribute, Map<String, String> parameters) throws HotBlocksException {
 		String value = loadStringValue(attribute, parameters);
 		if (value.isEmpty()) {
@@ -253,6 +288,26 @@ public class ConfigRule {
 		return Region.of(corner1, corner2);
 	}
 
+	protected Set<TriggerEvent> loadListenersValue(ConfigParam attribute, Map<String, String> parameters)
+			throws HotBlocksException {
+		Set<TriggerEvent> listenerSet = new HashSet<>();
+		String value = loadStringValue(attribute, parameters);
+		if (value.isEmpty()) {
+			return listenerSet;
+		}
+		List<String> listenerNames = Arrays.asList(value.split(" "));
+		for (String myListener : listenerNames) {
+			try {
+				myListener = myListener.toUpperCase();
+				listenerSet.add(TriggerEvent.valueOf(myListener));
+			} catch (Exception e) {
+				throw new HotBlocksException(getName() + "." + attribute.getAttributeName(), "Unknown Listener",
+						myListener);
+			}
+		}
+		return listenerSet;
+	}
+
 	protected void loadFromMap(Map<String, String> parameters) throws HotBlocksException {
 		validateMap(parameters);
 
@@ -260,7 +315,7 @@ public class ConfigRule {
 		Coordinate corner2 = loadCoordinateValue(ConfigParam.CORNER2, parameters);
 		this.region = buildRegion(corner1, corner2);
 
-		this.fromMaterial = loadMaterialValue(ConfigParam.FROM_MATERIAL, parameters);
+		this.fromMaterials.addAll(loadMaterialsValue(ConfigParam.FROM_MATERIAL, parameters));
 		this.toMaterial = loadMaterialValue(ConfigParam.TO_MATERIAL, parameters);
 		this.lifetime = loadIntValue(ConfigParam.LIFETIME, parameters);
 		this.worlds = loadWorldRegexValue(ConfigParam.WORLDS, parameters);
@@ -270,6 +325,7 @@ public class ConfigRule {
 		this.pitch = loadFloatValue(ConfigParam.PITCH, parameters);
 		this.continueModify = loadBoolValue(ConfigParam.CONTINUE_MODIFY, parameters);
 		this.points = loadIntValue(ConfigParam.POINTS, parameters);
+		this.listeners.addAll(loadListenersValue(ConfigParam.LISTENER, parameters));
 		this.custom = loadStringValue(ConfigParam.CUSTOM, parameters);
 	}
 
@@ -292,7 +348,7 @@ public class ConfigRule {
 	}
 
 	protected void validateConfig() throws HotBlocksException {
-		if ((fromMaterial == null) || (toMaterial == null)) {
+		if ((fromMaterials.isEmpty()) || (toMaterial == null)) {
 			throw new HotBlocksException(getName(), "Materials must be defined", null);
 		}
 

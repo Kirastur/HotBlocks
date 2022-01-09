@@ -8,6 +8,7 @@ import org.bukkit.plugin.Plugin;
 
 import de.polarwolf.hotblocks.api.HotBlocksOrchestrator;
 import de.polarwolf.hotblocks.config.Coordinate;
+import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.events.EventManager;
 import de.polarwolf.hotblocks.logger.HotLogger;
 
@@ -19,7 +20,7 @@ public class ModificationManager {
 
 	private boolean disabled = false;
 	protected List<Modification> modifications = new ArrayList<>();
-	protected Scheduler scheduler = null;
+	protected ModificationScheduler modificationScheduler = null;
 
 	public ModificationManager(HotBlocksOrchestrator orchestrator) {
 		this.plugin = orchestrator.getPlugin();
@@ -58,6 +59,12 @@ public class ModificationManager {
 		return (findModification(world, blockCoordinate) != null);
 	}
 
+	// A modification us useless until it is registered to the ModificationManager.
+	// During this process, the Modification gets a gateway to other Managers.
+	protected void prepareModification(Modification modification) {
+		modification.setModificationHelper(new ModificationHelper(eventManager, modification));
+	}
+
 	// Add an existing modification to the central list,
 	// so the scheduler can decrement lifetime and perform action on EOL.
 	// This function does not check if there is already another
@@ -65,6 +72,7 @@ public class ModificationManager {
 	// So use this function carefully.
 	public void addModification(Modification newModification) {
 		if (!disabled) {
+			prepareModification(newModification);
 			modifications.add(newModification);
 			hotLogger.printDebug(String.format("New Modification with Rule \"%s\" in world \"%s\" added",
 					newModification.getRule().getName(), newModification.getWorld().getName()));
@@ -102,7 +110,7 @@ public class ModificationManager {
 				removeModification(myModification);
 				if (continueModify) {
 					Coordinate blockCoordinate = myModification.getCoordinate();
-					myModification.getHotWorld().checkBlock(null, blockCoordinate);
+					myModification.getHotWorld().checkBlock(null, blockCoordinate, TriggerEvent.CASCADE);
 				}
 			}
 		}
@@ -125,9 +133,9 @@ public class ModificationManager {
 	// Start the Scheduler-Task if needed.
 	// The Scheduler stops itself automatically if he is idle.
 	protected void startScheduler() {
-		if (scheduler == null) {
-			scheduler = new Scheduler(this);
-			scheduler.runTaskTimer(plugin, 1, 1);
+		if (modificationScheduler == null) {
+			modificationScheduler = new ModificationScheduler(this);
+			modificationScheduler.runTaskTimer(plugin, 1, 1);
 			hotLogger.printDebug("Modification scheduler started");
 		}
 	}
@@ -135,9 +143,9 @@ public class ModificationManager {
 	// Stop the scheduler
 	// This is called if ModificationList is empty
 	protected void stopScheduler() {
-		if (scheduler != null) {
-			scheduler.cancel();
-			scheduler = null;
+		if (modificationScheduler != null) {
+			modificationScheduler.cancel();
+			modificationScheduler = null;
 			hotLogger.printDebug("Modification scheduler stopped");
 		}
 	}

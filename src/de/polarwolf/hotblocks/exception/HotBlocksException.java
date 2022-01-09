@@ -33,6 +33,13 @@ public class HotBlocksException extends Exception {
 		this.errorDetailText = null;
 	}
 
+	public HotBlocksException(Message message, Throwable cause) {
+		super(buildMessage(null, message.toString(), cause.getMessage()), cause, false, false);
+		this.contextName = null;
+		this.errorName = message.toString();
+		this.errorDetailText = null;
+	}
+
 	public String getContextName() {
 		return contextName;
 	}

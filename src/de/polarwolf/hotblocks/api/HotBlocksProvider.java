@@ -2,32 +2,30 @@ package de.polarwolf.hotblocks.api;
 
 public final class HotBlocksProvider {
 
-	private static HotBlocksAPI hotBlocksAPI;
+	private static HotBlocksAPI hotBlocksAPI = null;
 
 	private HotBlocksProvider() {
 	}
 
-	public static HotBlocksAPI getAPI() {
-		return hotBlocksAPI;
+	public static boolean hasAPI() {
+		return ((hotBlocksAPI != null) && !hotBlocksAPI.isDisabled());
 	}
 
-	static boolean clearAPI() {
-		if (hotBlocksAPI == null) {
-			return true;
+	public static HotBlocksAPI getAPI() {
+		if (hasAPI()) {
+			return hotBlocksAPI;
+		} else {
+			return null;
 		}
-		if (!hotBlocksAPI.isDisabled()) {
-			return false;
-		}
-		hotBlocksAPI = null;
-		return true;
 	}
 
 	static boolean setAPI(HotBlocksAPI newAPI) {
-		if (!clearAPI()) {
+		if (!hasAPI()) {
+			hotBlocksAPI = newAPI;
+			return true;
+		} else {
 			return false;
 		}
-		hotBlocksAPI = newAPI;
-		return true;
 	}
 
 }

@@ -14,6 +14,7 @@ public enum ConfigParam {
 	PITCH("Pitch", "0"),
 	CONTINUE_MODIFY("continueModify", "FALSE"),
 	POINTS("points", "0"),
+	LISTENER("listener", "PlayerMoveEvent PlayerTeleportEvent WorldCheck Cascade"),
 	CUSTOM("Custom", "");
 
 	private final String attributeName;

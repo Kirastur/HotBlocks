@@ -20,7 +20,6 @@ import de.polarwolf.hotblocks.api.HotBlocksProvider;
 import de.polarwolf.hotblocks.exception.HotBlocksException;
 import de.polarwolf.hotblocks.main.Main;
 import de.polarwolf.hotblocks.worlds.HotWorld;
-import static de.polarwolf.hotblocks.commands.ParamType.*;
 
 public class HotBlocksCommand implements CommandExecutor {
 
@@ -201,11 +200,11 @@ public class HotBlocksCommand implements CommandExecutor {
 	}
 
 	protected World parseWorld(Action action, String[] args) throws HotBlocksException {
-		int worldPosition = action.findPosition(WORLD);
+		int worldPosition = action.findPosition(ParamType.WORLD);
 		if (worldPosition == 0) {
 			return null;
 		}
-		if (args.length < worldPosition+1) {
+		if (args.length < worldPosition + 1) {
 			throw new HotBlocksException(Message.MISSING_WORLDNAME);
 		}
 		String worldName = args[worldPosition];
@@ -234,11 +233,11 @@ public class HotBlocksCommand implements CommandExecutor {
 	}
 
 	protected HotWorld parseHotWorld(Action action, String[] args) throws HotBlocksException {
-		int hotWorldPosition = action.findPosition(HOTWORLD);
+		int hotWorldPosition = action.findPosition(ParamType.HOTWORLD);
 		if (hotWorldPosition == 0) {
 			return null;
 		}
-		if (args.length < hotWorldPosition+1) {
+		if (args.length < hotWorldPosition + 1) {
 			throw new HotBlocksException(Message.MISSING_WORLDNAME);
 		}
 		String hotWorldName = args[hotWorldPosition];
@@ -273,11 +272,11 @@ public class HotBlocksCommand implements CommandExecutor {
 	}
 
 	protected Objective parseObjective(Action action, String[] args) throws HotBlocksException {
-		int objectivePosition = action.findPosition(OBJECTIVE);
+		int objectivePosition = action.findPosition(ParamType.OBJECTIVE);
 		if (objectivePosition == 0) {
 			return null;
 		}
-		if (args.length < objectivePosition+1) {
+		if (args.length < objectivePosition + 1) {
 			throw new HotBlocksException(Message.MISSING_OBJECTIVE);
 		}
 		String objectiveName = args[objectivePosition];

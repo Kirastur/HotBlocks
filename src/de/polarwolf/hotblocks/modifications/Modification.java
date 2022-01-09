@@ -3,6 +3,7 @@ package de.polarwolf.hotblocks.modifications;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 
 import de.polarwolf.hotblocks.config.ConfigRule;
 import de.polarwolf.hotblocks.config.Coordinate;
@@ -10,6 +11,7 @@ import de.polarwolf.hotblocks.worlds.HotWorld;
 
 public class Modification {
 
+	private ModificationHelper modificationHelper;
 	protected final HotWorld hotWorld;
 	protected final Coordinate coordinate;
 	protected final ConfigRule rule;
@@ -67,14 +69,22 @@ public class Modification {
 		return coordinate.equals(testCoordinate);
 	}
 
+	protected ModificationHelper getModificationHelper() {
+		return modificationHelper;
+	}
+
+	final void setModificationHelper(ModificationHelper modificationHelper) {
+		this.modificationHelper = modificationHelper;
+	}
+
 	// Perform the final Block Modification.
 	// It's named "default" for standard naming convention only.
 	// There is no way to change the Modification during the event.
 	// The ModifyBlock-Event can only cancel.
-	protected void performDefaultBlockModification() {
+	protected void performDefaultBlockModification(BlockData blockData) {
 		Location location = getLocation();
 		Block block = location.getBlock();
-		block.setType(rule.getToMaterial());
+		block.setBlockData(blockData);
 		if (rule.getSound() != null) {
 			block.getWorld().playSound(location, rule.getSound(), rule.getVolume(), rule.getPitch());
 		}
@@ -84,9 +94,11 @@ public class Modification {
 	// Do not call this directly because
 	// it does not stop the countdown
 	// so the perform can happens twice.
+	// Remember the explicit EOL-Check: The Event can enlarge the lifetime
 	protected boolean performBlockModification() {
-		if (hotWorld.getEventHelper().sendModifyBlockEvent(this)) {
-			performDefaultBlockModification();
+		BlockData blockData = rule.getToMaterial().createBlockData();
+		if ((modificationHelper != null) && modificationHelper.sendModifyBlockEvent(blockData) && isEndOfLife()) {
+			performDefaultBlockModification(blockData);
 			return true;
 		} else {
 			return false;
@@ -96,16 +108,9 @@ public class Modification {
 	// This function is called by the Scheduler on every Minecraft Tick
 	// to decrement the remaining lifetime
 	// and perform the action if EOL is reached.
-	// There are two EOL checks, because the ModifyBlock-Event can change it.
 	protected boolean handleTick() {
 		decrementRemainingLifetime();
-		if (!isEndOfLife()) {
-			return false;
-		}
-		if (!performBlockModification()) {
-			return false;
-		}
-		if (!isEndOfLife()) {
+		if (!isEndOfLife() || !performBlockModification()) {
 			return false;
 		}
 		return rule.isContinueModify();

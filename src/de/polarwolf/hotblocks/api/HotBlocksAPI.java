@@ -12,6 +12,7 @@ import de.polarwolf.hotblocks.config.ConfigManager;
 import de.polarwolf.hotblocks.config.ConfigRule;
 import de.polarwolf.hotblocks.config.ConfigSection;
 import de.polarwolf.hotblocks.config.Coordinate;
+import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.exception.HotBlocksException;
 import de.polarwolf.hotblocks.modifications.Modification;
 import de.polarwolf.hotblocks.modifications.ModificationManager;
@@ -23,13 +24,11 @@ public class HotBlocksAPI {
 	private final ConfigManager configManager;
 	private final ModificationManager modificationManager;
 	private final WorldManager worldManager;
-	private final HotBlocksOrchestrator orchestrator;
 
 	public HotBlocksAPI(HotBlocksOrchestrator orchestrator) {
 		this.configManager = orchestrator.getConfigManager();
-		this.modificationManager = orchestrator.getMofificationManager();
+		this.modificationManager = orchestrator.getModificationManager();
 		this.worldManager = orchestrator.getWorldManager();
-		this.orchestrator = orchestrator;
 	}
 
 	// ConfigManager
@@ -43,15 +42,15 @@ public class HotBlocksAPI {
 	}
 
 	public void replaceConfig(ConfigSection newConfigSection, CommandSender initiator) {
-		configManager.replaceConfig(newConfigSection, initiator);
+		configManager.replaceConfig(worldManager, initiator, newConfigSection);
 	}
 
 	public void reload(CommandSender initiator) {
-		configManager.reload(initiator);
+		configManager.reload(worldManager, initiator);
 	}
 
-	public void scheduleRedloadFoNextTick() {
-		configManager.scheduleRedloadFoNextTick();
+	public void scheduleRedloadFoNextTick(CommandSender initiator) {
+		configManager.scheduleRedloadFoNextTick(worldManager, initiator);
 	}
 
 	// ModificationManager
@@ -104,12 +103,16 @@ public class HotBlocksAPI {
 		return worldManager.removeHotWorld(world);
 	}
 
-	public boolean checkBlock(Player player, World world, Coordinate blockCoordinate) {
-		return worldManager.checkBlock(player, world, blockCoordinate);
+	public boolean checkBlock(Player player, World world, Coordinate blockCoordinate, TriggerEvent triggerEvent) {
+		return worldManager.checkBlock(player, world, blockCoordinate, triggerEvent);
 	}
 
-	public int checkPlayer(Player player, Location location) {
-		return worldManager.checkPlayer(player, location);
+	public void checkBlockNext(Player player, World world, Coordinate blockCoordinate, TriggerEvent triggerEvent) {
+		worldManager.checkBlockNext(player, world, blockCoordinate, triggerEvent);
+	}
+
+	public int checkPlayer(Player player, Location location, TriggerEvent triggerEvent) {
+		return worldManager.checkPlayer(player, location, triggerEvent);
 	}
 
 	public int checkWorld(World world) {
@@ -118,7 +121,7 @@ public class HotBlocksAPI {
 
 	// Disable
 	public boolean isDisabled() {
-		return orchestrator.isDisabled();
+		return modificationManager.isDisabled();
 	}
 
 }

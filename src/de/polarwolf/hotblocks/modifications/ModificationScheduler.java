@@ -2,11 +2,11 @@ package de.polarwolf.hotblocks.modifications;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class Scheduler extends BukkitRunnable {
+public class ModificationScheduler extends BukkitRunnable {
 
 	protected final ModificationManager modificationManager;
 
-	public Scheduler(ModificationManager modificationManager) {
+	public ModificationScheduler(ModificationManager modificationManager) {
 		this.modificationManager = modificationManager;
 	}
 

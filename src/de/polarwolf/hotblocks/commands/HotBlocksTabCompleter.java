@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
 import de.polarwolf.hotblocks.main.Main;
-import static de.polarwolf.hotblocks.commands.ParamType.*;
 
 public class HotBlocksTabCompleter implements TabCompleter {
 
@@ -45,22 +44,18 @@ public class HotBlocksTabCompleter implements TabCompleter {
 
 		String actionName = args[0];
 		Action action = hotBlocksCommand.findAction(actionName);
-		if (action == null) {
-			return new ArrayList<>();
-		}
-
-		if (args.length-1 > action.getParamCount()) {
+		if ((action == null) || (args.length-1 > action.getParamCount())) {
 			return new ArrayList<>();
 		}
 
 		ParamType paramType = action.getParam(args.length-1);
-		if (paramType == WORLD) {
+		if (paramType == ParamType.WORLD) {
 			return listWorlds();
 		}
-		if (paramType == HOTWORLD) {
+		if (paramType == ParamType.HOTWORLD) {
 			return listHotWorlds();
 		}
-		if (paramType == OBJECTIVE) {
+		if (paramType == ParamType.OBJECTIVE) {
 			return listObjectives();
 		}
 		return new ArrayList<>();

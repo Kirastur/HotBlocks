@@ -11,6 +11,7 @@ import de.polarwolf.hotblocks.commands.Message;
 import de.polarwolf.hotblocks.events.EventManager;
 import de.polarwolf.hotblocks.exception.HotBlocksException;
 import de.polarwolf.hotblocks.logger.HotLogger;
+import de.polarwolf.hotblocks.worlds.WorldManager;
 
 public class ConfigManager {
 
@@ -18,6 +19,7 @@ public class ConfigManager {
 	public static final String SECTION_RULES = "rules";
 	public static final String PARAM_STARTUP_PASSIVEMODE = "passiveMode";
 	public static final String PARAM_STARTUP_DEBUG = "debug";
+	public static final String PARAM_STARTUP_AUTOSTART = "autostart";
 	public static final boolean DEFAULT_PASSIVEMODE = false;
 	public static final boolean DEFAULT_DEBUG = false;
 
@@ -44,8 +46,17 @@ public class ConfigManager {
 				DEFAULT_DEBUG);
 	}
 
+	public static List<String> getStartupWorlds(Plugin startupPlugin) {
+		return startupPlugin.getConfig().getConfigurationSection(SECTION_STARTUP)
+				.getStringList(PARAM_STARTUP_AUTOSTART);
+	}
+
 	public List<ConfigRule> getRules() {
 		return section.getRules();
+	}
+
+	public boolean hasListener(TriggerEvent triggerEvent) {
+		return section.hasListener(triggerEvent);
 	}
 
 	public ConfigSection buildConfigSectionFromLocalConfigFile(Plugin plugin, String configPath)
@@ -61,44 +72,45 @@ public class ConfigManager {
 		return new ConfigSection(plugin.getName(), ruleFileSection);
 	}
 
-	public void replaceConfig(ConfigSection newConfigSection, CommandSender initiator) {
+	public void replaceConfig(WorldManager worldManager, CommandSender initiator, ConfigSection newConfigSection) {
 		if (newConfigSection != null) {
 			section = newConfigSection;
+			worldManager.updateListener();
 			int count = section.getRules().size();
+			String s = String.format(Message.RULES_LOADED.toString(), count);
 			if (initiator != null) {
-				String s = String.format(Message.RULES_LOADED.toString(), count);
 				initiator.sendMessage(s);
 			}
-			if (!plugin.getServer().getConsoleSender().equals(initiator)) {
-				hotLogger.printDebug(String.format("Configuration has %d rules loaded", count));
-			}
+			hotLogger.printInfo(s);
 		}
 	}
 
-	public void reload(CommandSender initiator) {
+	public void reload(WorldManager worldManager, CommandSender initiator) {
 		reloadScheduler = null;
 		plugin.reloadConfig();
 		boolean isAcknowledged = eventManager.sendRequestReloadEvent(initiator);
 		if (!isAcknowledged) {
 			try {
 				ConfigSection newSection = buildConfigSectionFromLocalConfigFile(plugin, SECTION_RULES);
-				replaceConfig(newSection, initiator);
+				replaceConfig(worldManager, initiator, newSection);
 			} catch (HotBlocksException hbe) {
 				if (initiator != null) {
 					initiator.sendMessage(hbe.getMessage());
 				}
+				hotLogger.printWarning(hbe.getMessage());
 			} catch (Exception e) {
 				if (initiator != null) {
 					initiator.sendMessage(Message.JAVA_EXCEPTOPN.toString());
 				}
+				hotLogger.printWarning(Message.JAVA_EXCEPTOPN.toString());
 				e.printStackTrace();
 			}
 		}
 	}
 
-	public void scheduleRedloadFoNextTick() {
+	public void scheduleRedloadFoNextTick(WorldManager worldManager, CommandSender initiator) {
 		if (reloadScheduler == null) {
-			reloadScheduler = new ReloadScheduler(plugin, this);
+			reloadScheduler = new ReloadScheduler(plugin, this, worldManager, initiator);
 		}
 	}
 
