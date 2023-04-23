@@ -17,6 +17,9 @@ import org.bukkit.entity.Player;
 
 import de.polarwolf.hotblocks.exception.HotBlocksException;
 
+/**
+ * A rule is a set of conditions and actions which defines a modification.
+ */
 public class ConfigRule {
 
 	protected final String name;

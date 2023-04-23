@@ -44,11 +44,11 @@ public class HotBlocksTabCompleter implements TabCompleter {
 
 		String actionName = args[0];
 		Action action = hotBlocksCommand.findAction(actionName);
-		if ((action == null) || (args.length-1 > action.getParamCount())) {
+		if ((action == null) || (args.length - 1 > action.getParamCount())) {
 			return new ArrayList<>();
 		}
 
-		ParamType paramType = action.getParam(args.length-1);
+		ParamType paramType = action.getParam(args.length - 1);
 		if (paramType == ParamType.WORLD) {
 			return listWorlds();
 		}

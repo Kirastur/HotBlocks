@@ -1,5 +1,8 @@
 package de.polarwolf.hotblocks.config;
 
+/**
+ * Define a cube which is used to limit a rule to only an area of the world.
+ */
 public record Region(Coordinate minCorner, Coordinate maxCorner) {
 
 	public boolean contains(Coordinate coordinate) {

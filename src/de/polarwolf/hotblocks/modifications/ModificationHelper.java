@@ -4,6 +4,11 @@ import org.bukkit.block.data.BlockData;
 
 import de.polarwolf.hotblocks.events.EventManager;
 
+/**
+ * Providing additional functionality to the Modification-object. This is needed
+ * because the Orchestrator starts the Subsystems (Managers) in a predefined
+ * order, so the ModificationManager is not aware of the EventManager.
+ */
 public class ModificationHelper {
 
 	protected final EventManager eventManager;

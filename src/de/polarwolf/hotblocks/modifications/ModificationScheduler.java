@@ -2,6 +2,9 @@ package de.polarwolf.hotblocks.modifications;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
+/**
+ * Internal Scheduler for Modification Lifetime
+ */
 public class ModificationScheduler extends BukkitRunnable {
 
 	protected final ModificationManager modificationManager;

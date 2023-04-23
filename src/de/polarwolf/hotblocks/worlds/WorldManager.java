@@ -18,6 +18,12 @@ import de.polarwolf.hotblocks.listener.ListenManager;
 import de.polarwolf.hotblocks.logger.HotLogger;
 import de.polarwolf.hotblocks.modifications.ModificationManager;
 
+/**
+ * With the World Manager you can enable and disable HotBlocks for a given
+ * world. From a technical point of view, an active World is represented by a
+ * {@link de.polarwolf.hotblocks.worlds.HotWorld HotWorld}-object. Most of the
+ * World-Properties are controlled by that object.
+ */
 public class WorldManager {
 
 	protected final Plugin plugin;

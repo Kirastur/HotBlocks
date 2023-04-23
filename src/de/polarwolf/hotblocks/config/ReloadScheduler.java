@@ -6,6 +6,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
+/**
+ * Internally used for scheduling a configuration reload
+ */
 public class ReloadScheduler extends BukkitRunnable {
 
 	protected final ConfigManager configManager;

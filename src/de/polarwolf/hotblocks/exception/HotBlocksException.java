@@ -2,6 +2,9 @@ package de.polarwolf.hotblocks.exception;
 
 import de.polarwolf.hotblocks.commands.Message;
 
+/**
+ * General HotBlocks exception
+ */
 public class HotBlocksException extends Exception {
 
 	private static final long serialVersionUID = 1L;

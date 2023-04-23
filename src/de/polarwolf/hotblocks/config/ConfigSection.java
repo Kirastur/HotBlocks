@@ -8,6 +8,11 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import de.polarwolf.hotblocks.exception.HotBlocksException;
 
+/**
+ * The ConfigSection (Ruleset) is an unordered list of rules. Per default the
+ * ruleset is searched in the HotBlocks plugin config.yml file in a section
+ * called "rules". With the API you can point to another section.
+ */
 public class ConfigSection {
 
 	protected final String name;

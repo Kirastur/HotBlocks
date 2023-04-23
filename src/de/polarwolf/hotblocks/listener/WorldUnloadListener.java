@@ -10,6 +10,10 @@ import org.bukkit.plugin.Plugin;
 
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
+/**
+ * Listen for World Unload Events. Then we must stop HotBlocks on this world as
+ * well.
+ */
 public class WorldUnloadListener implements Listener {
 
 	protected final Plugin plugin;

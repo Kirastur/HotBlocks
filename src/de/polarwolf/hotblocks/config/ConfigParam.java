@@ -1,5 +1,8 @@
 package de.polarwolf.hotblocks.config;
 
+/**
+ * Parameter which could be used in a Rule
+ */
 public enum ConfigParam {
 
 	WORLDS("worlds", ""),

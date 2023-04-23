@@ -1,17 +1,21 @@
 package de.polarwolf.hotblocks.main;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.polarwolf.hotblocks.api.HotBlocksOrchestrator;
-import de.polarwolf.hotblocks.bstats.Metrics;
 import de.polarwolf.hotblocks.commands.HotBlocksCommand;
 import de.polarwolf.hotblocks.config.ConfigManager;
 
+/**
+ * Plugin main
+ */
 public final class Main extends JavaPlugin {
 
 	// Please see modifications.ModificationManager for the Business-Logic
 
+	public static final int PLUGINID_HOTBLOCKS = 11767;
 	public static final String COMMAND_NAME = "hotblocks";
 
 	protected HotBlocksOrchestrator orchestrator = null;
@@ -45,9 +49,7 @@ public final class Main extends JavaPlugin {
 		hotBlocksCommand = new HotBlocksCommand(this, COMMAND_NAME);
 
 		// Enable bStats Metrics
-		// Please download the bstats-code direct form their homepage
-		// or disable the following instruction
-		new Metrics(this, Metrics.PLUGINID_HOTBLOCKS);
+		new Metrics(this, PLUGINID_HOTBLOCKS);
 
 		// Check for passiveMode
 		if (ConfigManager.isPassiveMode(this)) {

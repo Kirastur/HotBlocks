@@ -12,6 +12,9 @@ import org.bukkit.plugin.Plugin;
 import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
+/**
+ * Listen for Events when a player moves
+ */
 public class PlayerMoveListener implements Listener {
 
 	protected final Plugin plugin;

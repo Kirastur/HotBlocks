@@ -8,6 +8,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import de.polarwolf.hotblocks.config.Coordinate;
 import de.polarwolf.hotblocks.config.TriggerEvent;
 
+/**
+ * Internal Scheduler for checkBlockNext
+ */
 public class CheckBlockScheduler extends BukkitRunnable {
 
 	protected final WorldManager worldManager;

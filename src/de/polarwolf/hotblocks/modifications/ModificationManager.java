@@ -12,6 +12,14 @@ import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.events.EventManager;
 import de.polarwolf.hotblocks.logger.HotLogger;
 
+/**
+ * With the Modification Manager you can schedule Block modifications. Normally,
+ * a Modification is scheduled as a result of a positive check (the player has
+ * moved and the new location has a matching rule). But you can start a
+ * modification by your own, without any checks and triggers. You only need an
+ * Hotblocks enabled (activated) world, identified by the
+ * {@link de.polarwolf.hotblocks.worlds.HotWorld HotWorld} object.
+ */
 public class ModificationManager {
 
 	protected final Plugin plugin;
@@ -28,23 +36,27 @@ public class ModificationManager {
 		this.eventManager = orchestrator.getEventManager();
 	}
 
-	// Get the complete list of of active modifications.
-	// Perhaps you need it for some advanced game-features.
+	/**
+	 * Get the complete list of of active modifications. Perhaps you need it for
+	 * some advanced game-features.
+	 */
 	public List<Modification> getModifications() {
 		return new ArrayList<>(modifications);
 	}
 
-	// Test if ModificationQueue is empty
-	// Needed for the Scheduler to go to sleep if nothing to do.
+	/**
+	 * Test if ModificationQueue is empty Needed for the Scheduler to go to sleep if
+	 * nothing to do.
+	 */
 	public boolean isModificationQueueEmpty() {
 		return modifications.isEmpty();
 	}
 
-	// Find the Modification identified by the given location.
-	// A Location matches to the modification, if
-	// it belongs to the same word and
-	// the integer coordinates (Floor) are identical
-	// (which means they point to the same block)
+	/**
+	 * Find the Modification identified by the given location. A Location matches to
+	 * the modification, if it belongs to the same word and the integer coordinates
+	 * (Floor) are identical (which means they point to the same block)
+	 */
 	public Modification findModification(World world, Coordinate blockCoordinate) {
 		for (Modification myModification : modifications) {
 			if (myModification.contains(world, blockCoordinate)) {
@@ -54,22 +66,27 @@ public class ModificationManager {
 		return null;
 	}
 
-	// Check if the given location has an active modification.
+	/**
+	 * Check if the given location has an active modification.
+	 */
 	public boolean isModifying(World world, Coordinate blockCoordinate) {
 		return (findModification(world, blockCoordinate) != null);
 	}
 
-	// A modification us useless until it is registered to the ModificationManager.
-	// During this process, the Modification gets a gateway to other Managers.
+	/**
+	 * A modification is useless until it is registered to the ModificationManager.
+	 * During this process, the Modification gets a gateway to other Managers.
+	 */
 	protected void prepareModification(Modification modification) {
 		modification.setModificationHelper(new ModificationHelper(eventManager, modification));
 	}
 
-	// Add an existing modification to the central list,
-	// so the scheduler can decrement lifetime and perform action on EOL.
-	// This function does not check if there is already another
-	// modification for the same coordinates.
-	// So use this function carefully.
+	/**
+	 * Add an existing modification to the central list, so the scheduler can
+	 * decrement lifetime and perform action on EOL. This function does not check if
+	 * there is already another modification for the same coordinates. So use this
+	 * function carefully.
+	 */
 	public void addModification(Modification newModification) {
 		if (!disabled) {
 			prepareModification(newModification);
@@ -80,10 +97,11 @@ public class ModificationManager {
 		}
 	}
 
-	// Remove an existing modification.
-	// This stops the lifetime countdown.
-	// True: The modification was successfully removed.
-	// False: No modification for this location found.
+	/**
+	 * Remove an existing modification. This stops the lifetime countdown.
+	 *
+	 * @return TRUE if the Modification was successfully removed, otherwise FALSE
+	 */
 	public boolean removeModification(Modification oldModification) {
 		if (modifications.contains(oldModification)) {
 			modifications.remove(oldModification);
@@ -95,10 +113,12 @@ public class ModificationManager {
 		}
 	}
 
-	// Called by the scheduler to reduce the lifetime of every modification.
-	// Important: The continueModify-Check is done AFTER the modification
-	// was removed from queue, so that the duplicate check is not preventing
-	// the follow-on modification
+	/**
+	 * Called by the scheduler to reduce the lifetime of every modification.
+	 * Important: The continueModify-Check is done AFTER the modification was
+	 * removed from queue, so that the duplicate check is not preventing the
+	 * follow-on modification.
+	 */
 	protected void handleTick() {
 		if (isModificationQueueEmpty()) {
 			stopScheduler();
@@ -116,8 +136,10 @@ public class ModificationManager {
 		}
 	}
 
-	// Cancel all active modifications for the given world
-	// Needed for the WorldUnload-Event
+	/**
+	 * Cancel all active modifications for the given world. Needed for the
+	 * WorldUnload-Event
+	 */
 	public int cancelWorld(World world) {
 		int count = 0;
 		for (Modification myModification : new ArrayList<>(modifications)) {
@@ -130,8 +152,10 @@ public class ModificationManager {
 		return count;
 	}
 
-	// Start the Scheduler-Task if needed.
-	// The Scheduler stops itself automatically if he is idle.
+	/**
+	 * Start the Scheduler-Task if needed. The Scheduler stops itself automatically
+	 * if he is idle.
+	 */
 	protected void startScheduler() {
 		if (modificationScheduler == null) {
 			modificationScheduler = new ModificationScheduler(this);
@@ -140,8 +164,9 @@ public class ModificationManager {
 		}
 	}
 
-	// Stop the scheduler
-	// This is called if ModificationList is empty
+	/**
+	 * Stop the scheduler. This is called if ModificationList is empty
+	 */
 	protected void stopScheduler() {
 		if (modificationScheduler != null) {
 			modificationScheduler.cancel();
@@ -154,7 +179,9 @@ public class ModificationManager {
 		return disabled;
 	}
 
-	// Stop the Scheduler if the plugin gets disabled
+	/**
+	 * Stop the Scheduler if the plugin gets disabled
+	 */
 	public void disable() {
 		disabled = true;
 		stopScheduler();

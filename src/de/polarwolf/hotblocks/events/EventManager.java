@@ -14,6 +14,10 @@ import de.polarwolf.hotblocks.logger.HotLogger;
 import de.polarwolf.hotblocks.modifications.Modification;
 import de.polarwolf.hotblocks.worlds.HotWorld;
 
+/**
+ * Handles the sending of Minecraft Events.
+ */
+
 public class EventManager {
 
 	protected final Plugin plugin;

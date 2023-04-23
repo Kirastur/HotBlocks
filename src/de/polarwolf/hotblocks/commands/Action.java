@@ -7,17 +7,17 @@ import static de.polarwolf.hotblocks.commands.ParamType.WORLD;
 
 public enum Action {
 
-	ENABLE("enable",   WORLD, NONE),
+	ENABLE("enable", WORLD, NONE),
 	DISABLE("disable", HOTWORLD, NONE),
-	CHECK("check",     HOTWORLD, NONE),
-	CANCEL("cancel",   HOTWORLD, NONE),
-	PAUSE("pause",     HOTWORLD, NONE),
-	RESUME("resume",   HOTWORLD, NONE),
-	PRINT("print",     HOTWORLD, NONE),
+	CHECK("check", HOTWORLD, NONE),
+	CANCEL("cancel", HOTWORLD, NONE),
+	PAUSE("pause", HOTWORLD, NONE),
+	RESUME("resume", HOTWORLD, NONE),
+	PRINT("print", HOTWORLD, NONE),
 	SETOBJECTIVE("setobjective", HOTWORLD, OBJECTIVE),
-	LIST("list",     NONE, NONE),
+	LIST("list", NONE, NONE),
 	RELOAD("reload", NONE, NONE),
-	HELP("help",     NONE, NONE);
+	HELP("help", NONE, NONE);
 
 	private final String command;
 	private final ParamType param1;

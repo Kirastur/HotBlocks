@@ -11,6 +11,16 @@ import de.polarwolf.hotblocks.logger.HotLogger;
 import de.polarwolf.hotblocks.modifications.ModificationManager;
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
+/**
+ * The orchestrator is a central instance to start and stop the other HotBlocks
+ * subsystems (called "Managers"). When the plugin gets enabled, the
+ * Orchestrator is started and register itself at the global HotBlocksPrvider,
+ * so you can get the API to this Orchestrator.
+ *
+ * When you disable the plugin (or shutdown the server), the Orchestrator
+ * shutdown the other HotBlocks subsystems and unregister itself from the
+ * HotBlocksProvider.
+ */
 public class HotBlocksOrchestrator {
 
 	public static final String PLUGIN_NAME = "HotBlocks";

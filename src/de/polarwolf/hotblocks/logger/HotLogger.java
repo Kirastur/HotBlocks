@@ -4,6 +4,9 @@ import org.bukkit.plugin.Plugin;
 
 import de.polarwolf.hotblocks.config.ConfigManager;
 
+/**
+ * Handling log and debug messages
+ */
 public class HotLogger {
 
 	private boolean debug = true;

@@ -9,6 +9,15 @@ import de.polarwolf.hotblocks.config.ConfigRule;
 import de.polarwolf.hotblocks.config.Coordinate;
 import de.polarwolf.hotblocks.worlds.HotWorld;
 
+/**
+ * A Modification is the application of a singe rule to a single target block.
+ * Normally a Modificiation is created when Hot Blocks detects that a player has
+ * moved, and a block the player has stepped on fulfills the condition of a
+ * rule. Then a Mofication is created. The Modiciation has a lifetime which
+ * counts down on every Minecraft tick. If EndOfLife (EOL) is reached, the block
+ * gets changed (mostly the block's Material changes or the block gets deleted).
+ * Afterwards the Modification-objects is no longer needed and gets removed.
+ */
 public class Modification {
 
 	private ModificationHelper modificationHelper;
@@ -77,10 +86,11 @@ public class Modification {
 		this.modificationHelper = modificationHelper;
 	}
 
-	// Perform the final Block Modification.
-	// It's named "default" for standard naming convention only.
-	// There is no way to change the Modification during the event.
-	// The ModifyBlock-Event can only cancel.
+	/**
+	 * It's named "default" for standard naming convention only. There is no way to
+	 * change the Modification during the event. The ModifyBlock-Event can only
+	 * cancel.
+	 */
 	protected void performDefaultBlockModification(BlockData blockData) {
 		Location location = getLocation();
 		Block block = location.getBlock();
@@ -90,11 +100,11 @@ public class Modification {
 		}
 	}
 
-	// Prepare the Block Modification.
-	// Do not call this directly because
-	// it does not stop the countdown
-	// so the perform can happens twice.
-	// Remember the explicit EOL-Check: The Event can enlarge the lifetime
+	/**
+	 * Prepare the Block Modification. Do not call this directly because it does not
+	 * stop the countdown so the perform can happens twice. Remember the explicit
+	 * EOL-Check: The Event can enlarge the lifetime
+	 */
 	protected boolean performBlockModification() {
 		BlockData blockData = rule.getToMaterial().createBlockData();
 		if ((modificationHelper != null) && modificationHelper.sendModifyBlockEvent(blockData) && isEndOfLife()) {
@@ -105,9 +115,10 @@ public class Modification {
 		}
 	}
 
-	// This function is called by the Scheduler on every Minecraft Tick
-	// to decrement the remaining lifetime
-	// and perform the action if EOL is reached.
+	/**
+	 * This function is called by the Scheduler on every Minecraft Tick to decrement
+	 * the remaining lifetime and perform the action if EOL is reached.
+	 */
 	protected boolean handleTick() {
 		decrementRemainingLifetime();
 		if (!isEndOfLife() || !performBlockModification()) {

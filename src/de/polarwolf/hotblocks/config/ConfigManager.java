@@ -13,6 +13,13 @@ import de.polarwolf.hotblocks.exception.HotBlocksException;
 import de.polarwolf.hotblocks.logger.HotLogger;
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
+/**
+ * The Configuration Manager cares about the Ruleset which contains the
+ * individual rules. A single rule is represented by a
+ * {@link de.polarwolf.hotblocks.config.ConfigRule ConfigRule} object, the
+ * complete ruleset by a {@link de.polarwolf.hotblocks.config.ConfigSection
+ * ConfigSection} object. You can have only one Ruleset at at time.
+ */
 public class ConfigManager {
 
 	public static final String SECTION_STARTUP = "startup";

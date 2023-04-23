@@ -4,6 +4,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
+/**
+ * Internal notation scheme for X/Y/Z addresses. You can use
+ * {@link de.polarwolf.hotblocks.config.Coordinate#of(Location)
+ * Coordinate.of(Location)} to get the Coodinate of a Location. Two Locations
+ * match, if they belongs to the same word and the integer coordinates (Floor)
+ * are identical (which means they point to the same block).
+ */
 public record Coordinate(int x, int y, int z) {
 
 	public Vector toVector() {

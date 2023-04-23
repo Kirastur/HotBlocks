@@ -13,6 +13,9 @@ import de.polarwolf.hotblocks.config.Coordinate;
 import de.polarwolf.hotblocks.config.TriggerEvent;
 import de.polarwolf.hotblocks.worlds.WorldManager;
 
+/**
+ * Listen for Events when a player places a block
+ */
 public class BlockPlaceListener implements Listener {
 
 	protected final Plugin plugin;

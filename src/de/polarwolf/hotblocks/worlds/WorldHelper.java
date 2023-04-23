@@ -13,6 +13,11 @@ import de.polarwolf.hotblocks.logger.HotLogger;
 import de.polarwolf.hotblocks.modifications.Modification;
 import de.polarwolf.hotblocks.modifications.ModificationManager;
 
+/**
+ * Providing additional functionality to the HotWorld-object. This is needed
+ * because the Orchestrator starts the Subsystems (Managers) in a predefined
+ * order, so the WorldManager is not aware of the EventManager.
+ */
 public final class WorldHelper {
 
 	private final HotLogger hotLogger;
